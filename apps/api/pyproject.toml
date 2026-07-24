@@ -1,0 +1,20 @@
+[project]
+name = "snap-api"
+version = "0.0.0"
+description = "SnapNutrition FastAPI backend (modular monolith)."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "snap-shared-schemas",
+    "snap-nutrition-core",
+    "snap-allergen-core",
+    "snap-preprocessing",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/snap_api"]

@@ -1,0 +1,11 @@
+{
+  "name": "snapnutrition",
+  "private": true,
+  "version": "0.0.0",
+  "description": "SnapNutrition monorepo (JS/TS workspace root)",
+  "license": "MIT",
+  "packageManager": "pnpm@11.12.0",
+  "scripts": {
+    "lint": "echo \"TS workspaces are added in later tasks (T-005, T-030+)\" && exit 0"
+  }
+}

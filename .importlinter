@@ -1,0 +1,36 @@
+[importlinter]
+root_packages =
+    snap_api
+    snap_shared_schemas
+    snap_nutrition_core
+    snap_allergen_core
+    snap_preprocessing
+
+[importlinter:contract:pure-packages-independent]
+name = Core packages must not depend on the API app
+type = forbidden
+source_modules =
+    snap_shared_schemas
+    snap_nutrition_core
+    snap_allergen_core
+    snap_preprocessing
+forbidden_modules =
+    snap_api
+
+[importlinter:contract:nutrition-core-is-pure]
+name = nutrition-core must not import other internal packages
+type = forbidden
+source_modules =
+    snap_nutrition_core
+forbidden_modules =
+    snap_allergen_core
+    snap_api
+
+[importlinter:contract:allergen-core-is-pure]
+name = allergen-core must not import other internal packages
+type = forbidden
+source_modules =
+    snap_allergen_core
+    snap_nutrition_core
+forbidden_modules =
+    snap_api

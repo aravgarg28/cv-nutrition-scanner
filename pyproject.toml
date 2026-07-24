@@ -1,0 +1,68 @@
+[project]
+name = "snapnutrition"
+version = "0.0.0"
+description = "SnapNutrition — computer-vision nutrition & allergen scanner (monorepo root)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "MIT" }
+
+# Root is a workspace aggregator; runtime deps live in member packages/apps.
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+    "pyright>=1.1.380",
+    "pytest>=8",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",
+    "import-linter>=2.0",
+    "pre-commit>=3.8",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = [
+    "apps/api",
+    "packages/shared-schemas",
+    "packages/nutrition-core",
+    "packages/allergen-core",
+    "packages/preprocessing",
+]
+
+[tool.uv.sources]
+snap-shared-schemas = { workspace = true }
+snap-nutrition-core = { workspace = true }
+snap-allergen-core = { workspace = true }
+snap-preprocessing = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["apps/mobile", "apps/web-demo", "**/node_modules"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4"]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "snap_shared_schemas",
+    "snap_nutrition_core",
+    "snap_allergen_core",
+    "snap_preprocessing",
+    "snap_api",
+]
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+include = ["apps/api", "packages"]
+exclude = ["**/node_modules", "**/__pycache__", "apps/mobile", "apps/web-demo"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["apps", "packages", "tests"]
+python_files = ["test_*.py"]
+addopts = "--import-mode=importlib"
