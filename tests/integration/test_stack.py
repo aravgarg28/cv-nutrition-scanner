@@ -15,7 +15,7 @@ import urllib.request
 
 import pytest
 
-pytestmark = pytest.mark.integration
+pytestmark = [pytest.mark.integration, pytest.mark.stack]
 
 _ENABLED = os.environ.get("SNAP_INTEGRATION") == "1"
 skip_unless_enabled = pytest.mark.skipif(

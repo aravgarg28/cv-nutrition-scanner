@@ -56,8 +56,38 @@ jobs:
         run: uv run pyright
       - name: Import boundaries
         run: uv run lint-imports
-      - name: Pytest
-        run: uv run pytest -q
+      - name: Pytest (unit; integration deselected)
+        run: uv run pytest -q -m "not integration"
+
+  test-db:
+    name: Database / migration tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: snap
+          POSTGRES_PASSWORD: snap
+          POSTGRES_DB: snap
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U snap -d snap"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      SNAP_INTEGRATION: "1"
+      DATABASE_URL: postgresql+asyncpg://snap:snap@localhost:5432/snap
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync --all-packages --frozen
+      - name: Integration tests (migrations, DB — excludes full-stack smoke)
+        run: uv run pytest -q -m "integration and not stack"
 
   lint-type-ts:
     name: TypeScript lint / type
