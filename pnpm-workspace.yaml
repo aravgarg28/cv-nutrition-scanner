@@ -1,4 +1,3 @@
 packages:
-  - "apps/mobile"
-  - "apps/web-demo"
   - "packages/api-client"
+  # apps/mobile and apps/web-demo join once they have a package.json (T-030 / T-053).

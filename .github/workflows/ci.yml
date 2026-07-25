@@ -72,10 +72,11 @@ jobs:
           node-version: "20"
           cache: pnpm
       - name: Install
-        run: pnpm install --frozen-lockfile=false
+        run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm run lint
-      # tsc runs here once TS packages exist (T-005 / T-030+).
+      - name: Typecheck
+        run: pnpm -r --if-present run typecheck
 
   security:
     name: Security scans
@@ -113,6 +114,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Placeholder
-        # Real check (regenerate client, fail on diff) is added in T-005.
-        run: echo "schema-drift check is wired up in T-005 (client generation)."
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - name: Install deps
+        run: |
+          uv sync --all-packages --frozen
+          pnpm install --frozen-lockfile
+      - name: Regenerate OpenAPI + TS client
+        run: |
+          uv run python scripts/generate_openapi.py
+          pnpm --filter @snap/api-client run generate
+      - name: Fail on drift
+        run: |
+          if ! git diff --exit-code -- packages/api-client/openapi.json packages/api-client/src/schema.ts; then
+            echo "::error::OpenAPI/TS client is out of date. Run scripts/generate_openapi.py and 'pnpm --filter @snap/api-client generate', then commit."
+            exit 1
+          fi
