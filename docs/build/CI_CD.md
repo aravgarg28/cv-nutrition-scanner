@@ -1,5 +1,14 @@
 # CI/CD (GitHub Actions, free on public repo)
 
+> **Implementation status (T-002):** `ci.yml` exists with jobs `changes`
+> (dorny/paths-filter), `lint-type-py` (ruff + format + pyright + import-linter +
+> pytest), `lint-type-ts` (path-gated; `pnpm run lint` no-op until TS lands),
+> `security` (gitleaks + pip-audit + pnpm-audit), and `schema-drift` (placeholder
+> until T-005). Remaining jobs below (`safety-suite`, `ml-smoke`, `docker-build`,
+> `e2e-smoke`, `test-mobile`) are added by their owning tasks. pnpm-audit is advisory
+> while the JS workspace is empty and becomes strict when real JS deps land. The
+> README CI badge uses an `OWNER` placeholder to replace when the repo is pushed.
+
 ## Workflows
 
 ### `ci.yml` — every PR + main (path-filtered jobs, heavy caching)

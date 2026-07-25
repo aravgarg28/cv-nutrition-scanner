@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Path filtering: decide which lanes need to run. Python + security + schema-drift
+  # always run (they are the required checks); the TS lane is skipped when no TS/JS
+  # files changed. More lanes (ml-smoke, docker-build, safety-suite, e2e) are added
+  # by their owning tasks (see docs/build/CI_CD.md).
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      ts: ${{ steps.filter.outputs.ts }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            ts:
+              - 'apps/mobile/**'
+              - 'apps/web-demo/**'
+              - 'packages/api-client/**'
+              - 'package.json'
+              - 'pnpm-workspace.yaml'
+              - 'pnpm-lock.yaml'
+
+  lint-type-py:
+    name: Python lint / type / test / boundaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up uv (with cache)
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-packages --frozen
+      - name: Ruff lint
+        run: uv run ruff check .
+      - name: Ruff format check
+        run: uv run ruff format --check .
+      - name: Pyright
+        run: uv run pyright
+      - name: Import boundaries
+        run: uv run lint-imports
+      - name: Pytest
+        run: uv run pytest -q
+
+  lint-type-ts:
+    name: TypeScript lint / type
+    needs: changes
+    if: ${{ needs.changes.outputs.ts == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile=false
+      - name: Lint
+        run: pnpm run lint
+      # tsc runs here once TS packages exist (T-005 / T-030+).
+
+  security:
+    name: Security scans
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks (secret scan)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - name: pip-audit (Python deps)
+        run: |
+          uv export --format requirements-txt --no-emit-workspace --no-hashes > /tmp/reqs.txt
+          uvx pip-audit -r /tmp/reqs.txt
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: pnpm audit (JS deps)
+        # Advisory while the TS workspace is empty; becomes strict when real
+        # JS dependencies land (T-005 / T-030+). See docs/build/CI_CD.md.
+        run: |
+          pnpm install --frozen-lockfile=false
+          pnpm audit --audit-level high || true
+
+  schema-drift:
+    name: OpenAPI/TS client drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder
+        # Real check (regenerate client, fail on diff) is added in T-005.
+        run: echo "schema-drift check is wired up in T-005 (client generation)."
