@@ -1,7 +1,6 @@
 # SnapNutrition
 
-<!-- Replace OWNER with your GitHub username/org once the repo is pushed. -->
-[![CI](https://github.com/OWNER/snapnutrition/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/snapnutrition/actions/workflows/ci.yml)
+[![CI](https://github.com/aravgarg28/cv-nutrition-scanner/actions/workflows/ci.yml/badge.svg)](https://github.com/aravgarg28/cv-nutrition-scanner/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](LICENSE)
 
 > Photograph food, ingredient labels, nutrition panels, or barcodes and get
