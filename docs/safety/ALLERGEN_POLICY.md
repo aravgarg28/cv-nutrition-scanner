@@ -131,3 +131,7 @@ NOT `allergen_free`), and documentation must preserve this distinction.
 - v1.0 (2026-07-12): initial policy from planning session.
 - v1.1 (2026-07-12): added product-database source-attribution rule
   (ADVERSARIAL_REVIEW finding 6.1).
+- v1.1 (T-004): status codes and their severities are now frozen in code as
+  `snap_shared_schemas.AllergenStatusCode` / `SEVERITY_BY_STATUS`, pinned by literal
+  tests (`packages/shared-schemas/tests/test_enums.py`). Changing a code or severity
+  is a safety change: update the enum, this policy, and the tests together.
