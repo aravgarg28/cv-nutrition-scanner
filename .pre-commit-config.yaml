@@ -1,7 +1,9 @@
 # Fast local gate. Full CI is defined in .github/workflows/ci.yml (T-002).
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    # Keep in lockstep with the ruff version in the uv dev group (pyproject.toml)
+    # so the hook and `uv run ruff` never disagree on formatting.
+    rev: v0.16.0
     hooks:
       - id: ruff
         args: [--fix]

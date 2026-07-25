@@ -66,3 +66,6 @@ asyncio_mode = "auto"
 testpaths = ["apps", "packages", "tests"]
 python_files = ["test_*.py"]
 addopts = "--import-mode=importlib"
+markers = [
+    "integration: requires external services (Docker Compose stack); opt-in via SNAP_INTEGRATION=1",
+]

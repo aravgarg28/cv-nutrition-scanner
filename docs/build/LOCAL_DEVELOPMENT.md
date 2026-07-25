@@ -13,14 +13,22 @@ Maestro for E2E.
 
 ```bash
 git clone <repo> && cd snapnutrition
-cp configs/.env.example .env            # fill nothing to start; defaults target compose services
-uv sync                                  # python workspace deps
-pnpm install                             # TS workspace deps
-docker compose up -d                     # postgres(+pgvector) + minio (+ bucket init)
-uv run alembic upgrade head              # migrations
+cp configs/.env.example .env             # fill nothing to start; defaults target compose services
+uv sync --all-packages                   # python workspace deps (all members, editable)
+pnpm install                             # TS workspace deps (no-op until TS packages land)
+docker compose -f docker/compose.yaml up -d   # postgres(+pgvector) + minio (+ bucket init)
+uv run alembic upgrade head              # migrations (available from T-006)
 uv run python scripts/seed_dev.py        # nutrients, DV table, mappings, ontology,
-                                         # demo fixtures, dev user (dev@local / password printed)
+                                         # demo fixtures, dev user (dev@local / password printed) — from T-025
 ```
+
+If host port 5432/9000/9001/8000 is already in use, override it, e.g.:
+`POSTGRES_HOST_PORT=5433 docker compose -f docker/compose.yaml up -d`
+(also `MINIO_API_PORT`, `MINIO_CONSOLE_PORT`, `API_HOST_PORT`).
+
+Verify the stack (T-003):
+`SNAP_INTEGRATION=1 uv run pytest -m integration`
+(add `POSTGRES_HOST_PORT=5433` etc. if you overrode any port).
 
 ## Running things
 

@@ -1,0 +1,21 @@
+# Build-context hygiene for images built from the repo root (api Dockerfile).
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/.ruff_cache/
+.venv/
+**/node_modules/
+.git/
+.github/
+docs/
+ml/
+tests/
+data/
+infrastructure/
+docker/
+apps/mobile/
+apps/web-demo/
+packages/api-client/
+**/.env
+**/.env.*
+!**/.env.example
