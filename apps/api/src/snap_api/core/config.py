@@ -25,6 +25,13 @@ class Settings(BaseSettings):
     # Async SQLAlchemy URL. Compose default (host port may be overridden locally).
     database_url: str = "postgresql+asyncpg://snap:snap@localhost:5432/snap"
 
+    # Public base URL used to build links in outgoing email.
+    public_base_url: str = "http://localhost:8000"
+
+    # Email delivery. 'console' prints links to the logs (local/test); real providers
+    # are wired in later (docs/deployment/COST_MODEL.md).
+    email_provider: str = "console"
+
 
 @lru_cache
 def get_settings() -> Settings:

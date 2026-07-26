@@ -46,6 +46,19 @@ extend-exclude = ["apps/mobile", "apps/web-demo", "**/node_modules"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "C4"]
 
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency-injection markers are safe as argument defaults.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.File",
+    "fastapi.Form",
+]
+
 [tool.ruff.lint.isort]
 known-first-party = [
     "snap_shared_schemas",
