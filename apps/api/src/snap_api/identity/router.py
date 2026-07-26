@@ -9,6 +9,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from snap_api.audit.repo import AuditRepo
 from snap_api.core.db import get_session
 from snap_api.core.errors import ApiError
 from snap_api.identity.deps import get_current_user
@@ -20,6 +21,10 @@ from snap_api.identity.schemas import (
     LogoutRequest,
     LogoutResponse,
     MeResponse,
+    PasswordResetConfirmRequest,
+    PasswordResetConfirmResponse,
+    PasswordResetRequest,
+    PasswordResetRequestResponse,
     RefreshRequest,
     RegisterRequest,
     RegisterResponse,
@@ -36,7 +41,7 @@ def _service(
     session: AsyncSession = Depends(get_session),
     email_sender: EmailSender = Depends(get_email_sender),
 ) -> IdentityService:
-    return IdentityService(IdentityRepo(session), email_sender)
+    return IdentityService(IdentityRepo(session), email_sender, AuditRepo(session))
 
 
 def _tokens_response(tokens: IssuedTokens) -> TokenResponse:
@@ -116,6 +121,32 @@ async def logout(
     await service.logout(refresh_token=body.refresh_token)
     await session.commit()
     return LogoutResponse()
+
+
+@router.post("/password-reset", status_code=status.HTTP_202_ACCEPTED)
+async def password_reset(
+    body: PasswordResetRequest,
+    session: AsyncSession = Depends(get_session),
+    service: IdentityService = Depends(_service),
+) -> PasswordResetRequestResponse:
+    await service.request_password_reset(email=str(body.email))
+    await session.commit()
+    return PasswordResetRequestResponse()
+
+
+@router.post("/password-reset/confirm")
+async def password_reset_confirm(
+    body: PasswordResetConfirmRequest,
+    session: AsyncSession = Depends(get_session),
+    service: IdentityService = Depends(_service),
+) -> PasswordResetConfirmResponse:
+    try:
+        await service.confirm_password_reset(token=body.token, new_password=body.new_password)
+    except ApiError:
+        await session.rollback()
+        raise
+    await session.commit()
+    return PasswordResetConfirmResponse()
 
 
 @router.get("/me")

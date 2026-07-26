@@ -67,3 +67,25 @@ class MeResponse(BaseModel):
     email: str
     role: str
     email_verified: bool
+
+
+class PasswordResetRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    email: EmailStr
+
+
+class PasswordResetRequestResponse(BaseModel):
+    # Enumeration-safe: identical whether or not the email exists.
+    status: str = "reset_email_sent"
+
+
+class PasswordResetConfirmRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    token: str = Field(min_length=1, max_length=512)
+    new_password: str = Field(min_length=1, max_length=200)
+
+
+class PasswordResetConfirmResponse(BaseModel):
+    status: str = "password_reset"

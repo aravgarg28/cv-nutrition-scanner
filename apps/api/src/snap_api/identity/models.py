@@ -51,6 +51,22 @@ class EmailVerificationToken(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class PasswordResetToken(Base):
+    """Single-use password-reset token (1 h expiry). Only the hash is stored; the raw
+    token travels in the emailed link (docs/security/AUTHENTICATION_AND_AUTHORIZATION.md)."""
+
+    __tablename__ = "password_reset_tokens"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid7)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    token_hash: Mapped[str] = mapped_column(unique=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class Session(Base):
     """A refresh-token in a rotation family. Only the hash is stored. Rotating a token
     revokes the old row; presenting an already-revoked token is treated as theft and

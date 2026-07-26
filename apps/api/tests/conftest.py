@@ -64,7 +64,10 @@ async def _clean_tables(_migrated_db: None) -> AsyncIterator[None]:
     try:
         async with engine.begin() as conn:
             await conn.execute(
-                text("TRUNCATE email_verification_tokens, users RESTART IDENTITY CASCADE")
+                text(
+                    "TRUNCATE audit_events, password_reset_tokens, sessions, "
+                    "email_verification_tokens, users RESTART IDENTITY CASCADE"
+                )
             )
         yield
     finally:

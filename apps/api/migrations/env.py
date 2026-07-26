@@ -14,6 +14,7 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 
+import snap_api.audit.models  # noqa: F401  (register tables on Base.metadata)
 import snap_api.identity.models  # noqa: F401  (register tables on Base.metadata)
 from snap_api.core.config import Settings
 from snap_api.core.db import Base

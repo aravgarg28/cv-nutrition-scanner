@@ -1,0 +1,10 @@
+"""Canonical audit action names (stable strings)."""
+
+USER_REGISTERED = "user.registered"
+EMAIL_VERIFIED = "user.email_verified"
+LOGIN_SUCCEEDED = "auth.login_succeeded"
+LOGIN_FAILED = "auth.login_failed"
+ACCOUNT_LOCKED = "auth.account_locked"
+LOGGED_OUT = "auth.logged_out"
+PASSWORD_RESET_REQUESTED = "auth.password_reset_requested"
+PASSWORD_RESET_COMPLETED = "auth.password_reset_completed"
