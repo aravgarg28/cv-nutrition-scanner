@@ -29,3 +29,41 @@ class VerifyEmailRequest(BaseModel):
 
 class VerifyEmailResponse(BaseModel):
     status: str = "verified"
+
+
+class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    email: EmailStr
+    password: str = Field(min_length=1, max_length=200)
+    device_label: str | None = Field(default=None, max_length=100)
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int  # access-token lifetime in seconds
+
+
+class RefreshRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    refresh_token: str = Field(min_length=1, max_length=512)
+
+
+class LogoutRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    refresh_token: str = Field(min_length=1, max_length=512)
+
+
+class LogoutResponse(BaseModel):
+    status: str = "ok"
+
+
+class MeResponse(BaseModel):
+    id: str
+    email: str
+    role: str
+    email_verified: bool

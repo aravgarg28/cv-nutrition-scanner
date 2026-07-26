@@ -27,11 +27,16 @@ class ApiError(Exception):
 
     @classmethod
     def validation(cls, message: str) -> ApiError:
-        return cls(
-            code=ErrorCode.VALIDATION_ERROR,
-            message=message,
-            http_status=HTTP_422,
-        )
+        return cls(code=ErrorCode.VALIDATION_ERROR, message=message, http_status=HTTP_422)
+
+    @classmethod
+    def unauthorized(cls, message: str = "Unauthorized.") -> ApiError:
+        return cls(code=ErrorCode.UNAUTHORIZED, message=message, http_status=401)
+
+    @classmethod
+    def locked(cls, message: str) -> ApiError:
+        # Too many attempts; 423 Locked with the rate-limited code.
+        return cls(code=ErrorCode.RATE_LIMITED, message=message, http_status=423)
 
 
 def _envelope(request: Request, code: ErrorCode, message: str, http_status: int) -> JSONResponse:

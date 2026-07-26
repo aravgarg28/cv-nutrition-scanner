@@ -47,6 +47,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login */
+        post: operations["login_v1_auth_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Logout */
+        post: operations["logout_v1_auth_logout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Me */
+        get: operations["me_v1_auth_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh */
+        post: operations["refresh_v1_auth_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/register": {
         parameters: {
             query?: never;
@@ -90,6 +158,47 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** LoginRequest */
+        LoginRequest: {
+            /** Device Label */
+            device_label?: string | null;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Password */
+            password: string;
+        };
+        /** LogoutRequest */
+        LogoutRequest: {
+            /** Refresh Token */
+            refresh_token: string;
+        };
+        /** LogoutResponse */
+        LogoutResponse: {
+            /**
+             * Status
+             * @default ok
+             */
+            status: string;
+        };
+        /** MeResponse */
+        MeResponse: {
+            /** Email */
+            email: string;
+            /** Email Verified */
+            email_verified: boolean;
+            /** Id */
+            id: string;
+            /** Role */
+            role: string;
+        };
+        /** RefreshRequest */
+        RefreshRequest: {
+            /** Refresh Token */
+            refresh_token: string;
+        };
         /** RegisterRequest */
         RegisterRequest: {
             /**
@@ -107,6 +216,20 @@ export interface components {
              * @default verification_sent
              */
             status: string;
+        };
+        /** TokenResponse */
+        TokenResponse: {
+            /** Access Token */
+            access_token: string;
+            /** Expires In */
+            expires_in: number;
+            /** Refresh Token */
+            refresh_token: string;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -183,6 +306,125 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    login_v1_auth_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    logout_v1_auth_logout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LogoutRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogoutResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    me_v1_auth_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeResponse"];
+                };
+            };
+        };
+    };
+    refresh_v1_auth_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

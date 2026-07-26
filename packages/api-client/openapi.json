@@ -14,6 +14,111 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "LoginRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "device_label": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Label"
+          },
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "type": "object"
+      },
+      "LogoutRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "refresh_token": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Refresh Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "title": "LogoutRequest",
+        "type": "object"
+      },
+      "LogoutResponse": {
+        "properties": {
+          "status": {
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "LogoutResponse",
+        "type": "object"
+      },
+      "MeResponse": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "email_verified": {
+            "title": "Email Verified",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role",
+          "email_verified"
+        ],
+        "title": "MeResponse",
+        "type": "object"
+      },
+      "RefreshRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "refresh_token": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Refresh Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshRequest",
+        "type": "object"
+      },
       "RegisterRequest": {
         "additionalProperties": false,
         "properties": {
@@ -45,6 +150,34 @@
           }
         },
         "title": "RegisterResponse",
+        "type": "object"
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          },
+          "token_type": {
+            "default": "bearer",
+            "title": "Token Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token",
+          "expires_in"
+        ],
+        "title": "TokenResponse",
         "type": "object"
       },
       "ValidationError": {
@@ -114,6 +247,12 @@
         "title": "VerifyEmailResponse",
         "type": "object"
       }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
     }
   },
   "info": {
@@ -171,6 +310,155 @@
         "summary": "Readyz",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "login_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Login",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "logout_v1_auth_logout_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Logout",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/me": {
+      "get": {
+        "operationId": "me_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Me",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "refresh_v1_auth_refresh_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refresh",
+        "tags": [
+          "auth"
         ]
       }
     },

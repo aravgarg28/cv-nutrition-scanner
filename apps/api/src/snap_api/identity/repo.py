@@ -5,10 +5,10 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from snap_api.identity.models import EmailVerificationToken, User
+from snap_api.identity.models import EmailVerificationToken, Session, User
 
 
 class IdentityRepo:
@@ -43,3 +43,37 @@ class IdentityRepo:
 
     async def get_user(self, user_id: uuid.UUID) -> User | None:
         return await self.session.get(User, user_id)
+
+    # --- sessions (refresh-token families) ---
+
+    async def create_session(
+        self,
+        *,
+        user_id: uuid.UUID,
+        family_id: uuid.UUID,
+        token_hash: str,
+        expires_at: datetime,
+        device_label: str | None,
+    ) -> Session:
+        record = Session(
+            user_id=user_id,
+            family_id=family_id,
+            token_hash=token_hash,
+            expires_at=expires_at,
+            device_label=device_label,
+        )
+        self.session.add(record)
+        await self.session.flush()
+        return record
+
+    async def get_session_by_hash(self, token_hash: str) -> Session | None:
+        result = await self.session.execute(select(Session).where(Session.token_hash == token_hash))
+        return result.scalar_one_or_none()
+
+    async def revoke_family(self, family_id: uuid.UUID, *, at: datetime) -> None:
+        """Revoke every still-active token in a rotation family."""
+        await self.session.execute(
+            update(Session)
+            .where(Session.family_id == family_id, Session.revoked_at.is_(None))
+            .values(revoked_at=at)
+        )
